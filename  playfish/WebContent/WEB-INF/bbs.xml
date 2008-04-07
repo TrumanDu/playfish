@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="gbk"?>
+<missions>
+	<!-- 
+		范例：从普通的discuz！的BBS上读取内容
+	-->
+	<mission>
+		<target encode="gbk" timeout="15000">
+			<multi-url>
+				<single-url href="http://bbs.uuu9.com/forumdisplay.php?fid=170&amp;page=1" />
+			</multi-url>
+			<target-regex root="http://bbs.uuu9.com/">
+				<![CDATA[
+						<th.*?href\=\"(viewthread\.php\?tid\=\d{7}?&amp;extra\=page\%3D1)\"
+				]]>
+			</target-regex>
+			
+		</target>
+		 <cleaner>
+		 	<clean type="head"></clean>
+		 </cleaner>
+		<processer>
+			<!-- 获得楼主的整个div -->
+			<process flow="true">
+				<tag-filter pos="1" key="class" value="mainbox viewthread" />
+			</process>
+			
+			<!-- 获得作者名 -->
+			<process flow="false" table="bbs" field="author">
+				<regex-filter>
+					<![CDATA[
+						<td class=\"postauthor\">.*?<cite>.*?<a.*?>(.*?)</a>
+						]]>
+				</regex-filter>
+			</process>
+			
+			<!-- 获得发表时间 -->
+			<process flow="false" table="bbs" field="posttime">
+				<regex-filter>
+					<![CDATA[
+						<div class=\"postinfo\">.*?(\d{4}\-\d{1,2}\-\d{1,2}.*?\d{2}\:\d{2})
+						]]>
+				</regex-filter>
+			</process>
+			
+			<!-- 截取只保留帖子正文内容 -->
+			<process flow="true">
+				<tag-filter pos="1" key="class" value="postmessage defaultpost" />
+			</process>
+			
+			<!-- 获得文章标题 -->
+			<process flow="false" table="bbs" field="title" textonly="true">
+				<tag-filter pos="1" key="name" value="h2" />
+			</process>
+			
+			<!-- 获得文章内容 -->
+			<process flow="false" table="bbs" field="content">
+				<tag-filter pos="1" key="class" value="t_msgfont" />
+			</process>
+			
+		</processer>
+	</mission>
+</missions>

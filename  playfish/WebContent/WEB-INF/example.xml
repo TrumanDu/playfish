@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="gbk"?>
+<missions>
+	<!-- 
+		MISSION 1 START 
+		范例：读取javaeye上playfish的博客内容，并将内容分为标题，关键字，内容存入数据库中
+		链接的写法注意:xml规范要求 某些实体符号需要转义，包括<>& 分别为&lt; &gt; &amp;
+	-->
+	<mission>
+		<!-- 
+			encode	指定目标页面的编码
+			timeout	指定传输页面的超时时限，超过多少ms判定为失败
+		-->
+		<target encode="UTF-8" timeout="8000">
+			<multi-url>
+				<single-url href="http://playfish.javaeye.com/?page=1" />
+			</multi-url>
+			<wildcard-url href="http://playfish.javaeye.com/?page=(*)"
+				startpos="1" endpos="3" />
+			<!-- 
+				注意：root会被添加到匹配完成后的链接，然后整个作为url目标地址返回
+				如果匹配得到的href已经是完整的url，带有http标签，那么请将root置为空
+			-->
+			<target-regex root="http://playfish.javaeye.com">
+				<![CDATA[
+						href\=\'(/blog/\d*)\'
+				]]>
+			</target-regex>
+		</target>
+		<!-- 
+			新增加clean，类似处理里面的flow为true的情境，目的是消除不想要的内容
+			并且可以提高process的处理效率
+			clean-head   清除head内的东西
+			clean-css    清除css代码
+			clean-script 清除script代码
+			clean-tags   清除抓取到的内容里面的html标签,如果为空，清除所有标签。如果不为空，清除指定.不同标签用|隔开
+			clean-regex  清除符合正则表达式的内容，最强大的功能，其他的其实都是基于正则表达式
+			注意	：		 除了清除头部只保留body部分外。其他clean都是极其消耗资源的操作，
+			后台会对内容执行大量的替换操作，而导致CPU 100％占用
+		-->
+		<cleaner>
+			<clean type="head"></clean>
+			<!--	
+				<clean type="css">css</clean>
+				<clean type="script">script</clean>
+				<clean type="tags">
+				<![CDATA[
+				<table>|</table>|<br />
+				]]>
+				</clean>
+				<clean type="regex">
+				<![CDATA[
+				
+				]]>
+				</clean>
+			-->
+		</cleaner>
+		<processer>
+			<!-- 
+				store 		指解析结果是否放入数据库，
+				table 		指结果所放的数据库表，可能不同的解析果然要放入不同的表。注意，目前仅允许所有的table都一样
+				即，所有结果只能存入一个表。如果需要将不同步骤放入不同的表，需要用户自行进行数据库操作
+				最后一个存入数据库的字段必须指定这个table值
+				field 		指对应的数据库字段，用户必须自己保证定义的table里面包含这个field，否则会导致数据库错误
+				flow  		指流程，即解析完的内容是作为下一个步骤的内容或者回退到未解析前的内容.
+				true 	本步骤处理结果作为下步骤处理的材料。
+				false	本步骤结果只在本步骤使用。下一个解析回退到本步骤之前的内容
+				对一些内容进行清理可能对于下一步的解析有帮助
+				textonly	只取文本部分，这个设定将除去文本中所有的html标签，可选属性
+				true	只取文本
+				false	包含全部，默认为false
+			-->
+
+			<!-- 
+				key类型  含义
+				name  	标签名
+				id 	   	标签id
+				class  	标签类
+				pos   	标签的序号，默认为1
+				注意:name,id,class只能有一个，如果需要多重过滤，需要增加process
+			-->
+			<process flow="true">
+				<tag-filter pos="1" key="id" value="main" />
+			</process>
+			<process flow="false" table="je_article" field="title">
+				<regex-filter>
+					<![CDATA[
+						<div class=\"blog_title\">.*<h3><.*?>(.*?)</a>.*?</div>
+						]]>
+				</regex-filter>
+			</process>
+			<process flow="false" table="je_article" field="tags">
+				<regex-filter>
+					<![CDATA[
+						<div class=\"blog_title\">.*?</strong>:(.*?)</div>
+						]]>
+				</regex-filter>
+			</process>
+			<process flow="false" table="je_article" field="content">
+				<flag-filter>
+					<start-flag>
+						<![CDATA[
+							<div class="blog_content">
+						]]>
+					</start-flag>
+					<end-flag>
+						<![CDATA[
+							<div class="blog_bottom">
+						]]>
+					</end-flag>
+				</flag-filter>
+			</process>
+		</processer>
+	</mission>
+	<mission>
+		<target encode="gbk" timeout="15000">
+			<multi-url>
+				<single-url
+					href="http://bbs.uuu9.com/forumdisplay.php?fid=170&amp;page=1" />
+			</multi-url>
+			<target-regex root="http://bbs.uuu9.com/">
+				<![CDATA[
+						<th.*?href\=\"(viewthread\.php\?tid\=\d{7}?&amp;extra\=page\%3D1)\"
+				]]>
+			</target-regex>
+
+		</target>
+		<cleaner>
+			<clean type="head"></clean>
+		</cleaner>
+		<processer>
+			<!-- 获得楼主的整个div -->
+			<process flow="true">
+				<tag-filter pos="1" key="class"
+					value="mainbox viewthread" />
+			</process>
+
+			<!-- 获得作者名 -->
+			<process flow="false" table="bbs" field="author">
+				<regex-filter>
+					<![CDATA[
+						<td class=\"postauthor\">.*?<cite>.*?<a.*?>(.*?)</a>
+						]]>
+				</regex-filter>
+			</process>
+
+			<!-- 获得发表时间 -->
+			<process flow="false" table="bbs" field="posttime">
+				<regex-filter>
+					<![CDATA[
+						<div class=\"postinfo\">.*?(\d{4}\-\d{1,2}\-\d{1,2}.*?\d{2}\:\d{2})
+						]]>
+				</regex-filter>
+			</process>
+
+			<!-- 截取只保留帖子正文内容 -->
+			<process flow="true">
+				<tag-filter pos="1" key="class"
+					value="postmessage defaultpost" />
+			</process>
+
+			<!-- 获得文章标题 -->
+			<process flow="false" table="bbs" field="title"
+				textonly="true">
+				<tag-filter pos="1" key="name" value="h2" />
+			</process>
+
+			<!-- 获得文章内容 -->
+			<process flow="false" table="bbs" field="content">
+				<tag-filter pos="1" key="class" value="t_msgfont" />
+			</process>
+
+		</processer>
+	</mission>
+</missions>

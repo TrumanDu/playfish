@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="gbk"?>
+<missions>
+	<!-- 
+		范例：抓取baidu贴吧内容
+	-->
+	<mission>
+		<target encode="gb2312" timeout="4000">
+			<multi-url>
+				<single-url href="http://tieba.baidu.com/f?kz=198768473" />
+				<single-url href="http://tieba.baidu.com/f?kz=341101091" />
+				<!--
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=0" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=50" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=100" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=150" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=200" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=250" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=300" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=350" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=400" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=450" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=500" />
+				<single-url href="http://tieba.baidu.com/f?z=0&amp;ct=318767104&amp;lm=11&amp;sc=0&amp;rn=50&amp;tn=baiduKeywordSearch&amp;rs3=0&amp;rs4=0&amp;word=java&amp;pn=550" />
+				-->
+			</multi-url>
+			<!--
+			<target-regex root="http://tieba.baidu.com">
+				<![CDATA[
+						class=t\shref=\"(.*?)\"
+				]]>
+			</target-regex>
+			-->
+		</target>
+		 <cleaner>
+		 	<clean type="head"></clean>
+		 </cleaner>
+		<processer>
+			<process flow="false" table="baidu" field="content">
+				<flag-filter>
+					<start-flag>
+						<![CDATA[
+							<table width="72%"
+						]]>
+					</start-flag>
+					<end-flag>
+						<![CDATA[
+							<table width="75%"
+						]]>
+					</end-flag>
+				</flag-filter>
+			</process>
+		</processer>
+	</mission>
+</missions>

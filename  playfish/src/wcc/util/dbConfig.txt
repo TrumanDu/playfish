@@ -1,0 +1,7 @@
+conn_type=
+conn_url=jdbc:mysql://localhost:3306/wcc?useUnicode=true&amp;characterEncoding=utf8
+conn_user=root
+conn_pwd=admin
+conn_driver=org.gjt.mm.mysql.Driver
+request_encode=utf8
+page_size=20
