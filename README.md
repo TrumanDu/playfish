@@ -1,5 +1,6 @@
 # playfish
 playfish 基于JAVA技术的网页内容智能抓取
+<pre><code>
 基于JAVA技术的网页内容智能抓取
 架构
 完全基于java的技术
@@ -242,3 +243,4 @@ XML规则：
 </process>
 第四步：抓取
 	只要执行SystemCore并带上要执行的xml文件名作为参数，任务就会开始。可以同时观察数据库跟控制台来观察抓取的进度。
+</code></pre>
